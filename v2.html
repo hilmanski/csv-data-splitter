@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Row Splitter</title>
+</head>
+<body>
+    <h2>CSV Row Splitter</h2>
+    <textarea id="inputArea" rows="20" cols="50"></textarea><br>
+
+    <div>
+        Split by: <input type="number" value="10" id="maxRowsInput" /> rows
+    </div>
+
+    <br><br>
+
+    <button onclick="processAndDownloadCSV()">Process and Download CSV</button>
+
+    <script>
+        function processAndDownloadCSV() {
+            const inputArea = document.getElementById('inputArea');
+            const maxRowInput = document.getElementById('maxRowsInput');
+            const maxRows = parseInt(maxRowInput.value, 10);
+            const inputContent = inputArea.value.trim();
+            if (inputContent) {
+                // Turn all \n into separated with comma until the maxRows
+                const rows = inputContent.split('\n');
+                const output = [];
+
+                for (let i = 0; i < rows.length; i += maxRows) {
+                    const chunk = rows.slice(i, i + maxRows).map(cell => `'${cell}`);
+                    output.push(chunk.join(','));
+                }
+
+                const blob = new Blob([output.join('\n')], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                // fileName = voucher_yyyyMMdd.csv
+                const fileName = 'voucher_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.csv';
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                alert('Please enter CSV data in the textarea.');
+            }
+        }
+    </script>
+</body>
+</html>
